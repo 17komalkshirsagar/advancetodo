@@ -120,12 +120,12 @@ exports.createTodo = asyncHandler(async (req, res) => {
     res.json({ message: "Todo create Success" })
 })
 exports.readTodo = asyncHandler(async (req, res) => {
-    const result = await Todo.find()
+    const result = await Todo.find().populate("team").populate("employee").populate('completeBy').sort({ createdAt: -1 })
     res.jsom({ message: "Todo all featch succesfull", result })
 })
 exports.updateTodo = asyncHandler(async (req, res) => {
     const { id } = req.params
-    await Todo.findByIdAndUpdate(id, req.body)
+    await Todo.findByIdAndUpdate(id, req.body, { isComplete: true })
     res.json({ message: "Update Todo Success" })
 })
 exports.deleteTodo = asyncHandler(async (req, res) => {
