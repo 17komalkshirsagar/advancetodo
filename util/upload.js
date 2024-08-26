@@ -1,17 +1,32 @@
-const multer = require("multer")
-const { v4: uuid } = require("uuid")
-const path = require("path")
-const fs = require("fs")
+// const multer = require("multer")
+// const { v4: uuid } = require("uuid")
+// const path = require("path")
+// const fs = require("fs")
 
-const profileStorage = multer.diskStorage({
+// const profileStorage = multer.diskStorage({
+//     filename: (req, file, cb) => {
+//         cb(null, uuid() + path.extname(file.originalname))
+//     },
+//     // destination: (req, file, cb) => cb(null, "profile"), important 
+// })
+
+
+
+// const uploadProfile = multer({ storage: profileStorage }).single("hero")
+
+// module.exports = { uploadProfile, }
+
+
+const multer = require("multer")
+const path = require("path")
+
+const storage = multer.diskStorage({
     filename: (req, file, cb) => {
-        cb(null, uuid() + path.extname(file.originalname))
+        const fn = Date.now() + path.extname(file.originalname)
+        cb(null, fn)
     },
-    destination: (req, file, cb) => cb(null, "profile"),
 })
 
+const upload = multer({ storage }).single("hero")
 
-
-const uploadProfile = multer({ storage: profileStorage }).single("avatar")
-
-module.exports = { uploadProfile, }
+module.exports = upload
