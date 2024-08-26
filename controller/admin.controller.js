@@ -105,7 +105,7 @@ exports.deactivateEmployee = asyncHandler(async (req, res) => {
 
 exports.createTodo = asyncHandler(async (req, res) => {
     const { task, desc, dueDate, team, employee } = req.body
-    const { isErro, error } = checkEmpty({ task, desc, dueDate, team, })
+    const { isError, error } = checkEmpty({ task, desc, dueDate, team, })
     if (isError) {
         return res.status(400).json({ message: "Nmae is required", error })
     }
@@ -121,7 +121,7 @@ exports.createTodo = asyncHandler(async (req, res) => {
 })
 exports.readTodo = asyncHandler(async (req, res) => {
     const result = await Todo.find().populate("team").populate("employee").populate('completeBy').sort({ createdAt: -1 })
-    res.jsom({ message: "Todo all featch succesfull", result })
+    res.json({ message: "Todo all featch succesfull", result })
 })
 exports.updateTodo = asyncHandler(async (req, res) => {
     const { id } = req.params
