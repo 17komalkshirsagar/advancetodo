@@ -21,7 +21,7 @@ router
 
 
     //Todo
-    .post("/ create-todo", adminController.createTodo)
+    .post("/create-todo", adminController.createTodo)
     .get("/read-todo", adminController.readTodo)
     .put("/update-todo/:id", adminController.updateTodo)
     .delete("/delete-todo/:id", adminController.deleteTodo)
