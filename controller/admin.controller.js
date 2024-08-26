@@ -32,7 +32,7 @@ exports.updateTeam = asyncHandler(async (req, res) => {
 })
 exports.deleteTeam = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const { isErro, error } = checkEmpty({ id })
+    const { isError, error } = checkEmpty({ id })
     if (isError) {
         return res.status(400).json({ message: "id is required", error })
     }
