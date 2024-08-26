@@ -9,7 +9,7 @@ const bcrypt = require("bcryptjs")
 //team
 exports.createTeam = asyncHandler(async (req, res) => {
     const { name } = req.body
-    const { isErro, error } = checkEmpty({ name })
+    const { isError, error } = checkEmpty({ name })
     if (isError) {
         return res.status(400).json({ message: "Nmae is required", error })
     }
