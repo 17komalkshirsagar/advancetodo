@@ -5,8 +5,10 @@ const Employee = require("../modal/Employee")
 const Todo = require("../modal/Todo")
 const cloudinary = require("../util/cloudinary.config")
 const bcrypt = require("bcryptjs")
-const upload = require("../util/upload")
-
+const upload = require("./../util/upload")
+const sendEmail = require("../util/email")
+const validator = require("validator")
+// const validator = require("validator")
 //team
 exports.createTeam = asyncHandler(async (req, res) => {
     const { name } = req.body
@@ -60,125 +62,67 @@ exports.getAllEmployee = asyncHandler(async (req, res) => {
     return res.json({ messsage: "Fetch All Employee Success", result })
 })
 
-// exports.registerEmployee = asyncHandler(async (req, res) => {
-//     upload(req, res, async err => {
-//         if (err) {
-//             console.log(err);
-
-//             return res.status(400).json({ message: err.message || "Unable to upload image" })
-
-//         }
-//         console.log(req.file)
-//         if (!req.file) {
-//             return res.status(400).json({ message: "No file uploaded" });
-//         }
-
-//         const { name, email, password, mobile, team } = req.body
-//         const { isError, error } = checkEmpty({ name, email, password, mobile, team })
-//         if (isError) {
-//             return res.status(400).json({ messsage: "All Feilds Required", error })
-//         }
-//         const result = await Employee.findOne({
-//             $or: [
-//                 { email },
-//                 { mobile }
-//             ]
-//         })
-//         if (result) {
-//             return res.status(400).json({ messsage: "Email all ready exits" })
-//         }
-//         const hash = await bcrypt.hash(password, 10)
-//         if (req.file) {
-//             const { secure_url } = await cloudinary.uploader.upload(req.file.path)
-//             await Employee.create({ name, email, password: hash, mobile, team, avatar: secure_url })
-//             res.json({ messsage: "egister file Success" })
-//         } else {
-
-//             await Employee.create({ name, email, password: hash, mobile, team, })
-//             // await Employee.create({ name, email, password: hash, mobile, team, ...req.body, avatar: req.file.filename })
-//             res.json({ messsage: "egister Employee Success" })
-//         }
-
-
-//     })
-// })
-
-
-
-
 exports.registerEmployee = asyncHandler(async (req, res) => {
-    // Use multer middleware to handle file upload
-    upload.single('hero')(req, res, async (err) => {
+    upload(req, res, async err => {
         if (err) {
-            console.error(err);
-            return res.status(400).json({ message: err.message || "Unable to upload image" });
-        }
+            console.log(err);
 
-        // Check if file is uploaded
+            return res.status(400).json({ message: err.message || "Unable to upload image" })
+
+        }
+        console.log(req.file)
         if (!req.file) {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
-        // Destructure fields from request body
-        const { name, email, password, mobile, team } = req.body;
+        const { name, email, password, mobile, team } = req.body
 
-        // Validate input fields
-        const { isError, error } = checkEmpty({ name, email, password, mobile, team });
+        const { isError, error } = checkEmpty({ name, email, mobile, team })
         if (isError) {
-            return res.status(400).json({ message: "All fields are required", error });
+            return res.status(400).json({ messsage: "All Feilds Required", error })
+        }
+        if (!validator.isEmail(email)) {
+            return res.status(400).json({ messsage: "Invalid Email", error: "Invalid Email" })
+        }
+        if (!validator.isMobilePhone(mobile.toString(), "en-IN")) {
+            return res.status(400).json({ messsage: "Invalid Mobile", error: "Invalid Mobile" })
+        }
+        if (isError) {
+            return res.status(400).json({ messsage: "All Feilds Required", error })
+        }
+        const result = await Employee.findOne({
+            $or: [
+                { email },
+                { mobile }
+            ]
+        })
+        if (result) {
+            return res.status(400).json({ messsage: "Email all ready exits" })
+        }
+        // const hash = await bcrypt.hash("123", 10)
+        const pass = email.slice(0, 4) + mobile.toString().slice(6, 10)
+        const hashPass = await bcrypt.hash(pass, 10)
+        await sendEmail({
+            to: email, subject: "Welcome to Lab SAAS", message: `
+        <h1>${name},Welcome to Lab SAAS</h1>
+        <p>Use this password for Login ${pass}</p>
+        `
+
+        })
+        if (req.file) {
+            const { secure_url } = await cloudinary.uploader.upload(req.file.path)
+            await Employee.create({ name, email, password: hashPass, mobile, team, avatar: secure_url })
+            res.json({ messsage: "egister file Success" })
+        } else {
+
+            await Employee.create({ name, email, password: hashPass, mobile, team, })
+            // await Employee.create({ name, email, password: hash, mobile, team, ...req.body, avatar: req.file.filename })
+            res.json({ messsage: "egister Employee Success" })
         }
 
-        // Check if the employee with the same email or mobile already exists
-        const existingEmployee = await Employee.findOne({
-            $or: [{ email }, { mobile }]
-        });
 
-        if (existingEmployee) {
-            return res.status(400).json({ message: "Email or mobile number already exists" });
-        }
-
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Initialize avatar URL
-        let avatarUrl = '';
-
-        // Upload file to Cloudinary
-        try {
-            const result = await cloudinary.uploader.upload(req.file.path);
-            avatarUrl = result.secure_url;
-        } catch (uploadError) {
-            console.error(uploadError);
-            return res.status(500).json({ message: "Failed to upload image" });
-        }
-
-        // Create a new employee record
-        try {
-            await Employee.create({
-                name,
-                email,
-                password: hashedPassword,
-                mobile,
-                team,
-                avatar: avatarUrl
-            });
-            res.status(201).json({ message: "Employee registered successfully" });
-        } catch (createError) {
-            console.error(createError);
-            res.status(500).json({ message: "Failed to register employee" });
-        }
-    });
-});
-
-
-
-
-
-
-
-
-
-
+    })
+})
 
 
 exports.activateEmployee = asyncHandler(async (req, res) => {
