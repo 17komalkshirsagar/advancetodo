@@ -14,6 +14,7 @@ router
 
 
     .post("/register-employee", adminController.registerEmployee)
+    .get("/get-AllEmployee", adminController.getAllEmployee)
 
     .put("/activate-employee/:id", adminController.activateEmployee)
     .put("/deactivate-employee/:id", adminController.deactivateEmployee)

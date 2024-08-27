@@ -26,9 +26,8 @@ const employeeSchema = new mongoose.Schema({
 
     },
     avatar: {
-        type: Boolean,
-        default: ""
-
+        type: String,
+        default: "employee-default.png"
     },
 
     team: [{

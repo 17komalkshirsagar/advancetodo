@@ -54,6 +54,11 @@ exports.deactivateTeam = asyncHandler(async (req, res) => {
 
 //employee
 
+exports.getAllEmployee = asyncHandler(async (req, res) => {
+    const result = await Employee.find().populate('team')
+    return res.json({ messsage: "Fetch All Employee Success", result })
+})
+
 exports.registerEmployee = asyncHandler(async (req, res) => {
     upload(req, res, async err => {
         if (err) {
@@ -90,6 +95,8 @@ exports.registerEmployee = asyncHandler(async (req, res) => {
 
     })
 })
+
+
 exports.activateEmployee = asyncHandler(async (req, res) => {
     const { id } = req.params
     await Employee.findByIdAndUpdate(id, { isActive: true })
