@@ -104,6 +104,63 @@ exports.registerEmployee = asyncHandler(async (req, res) => {
 })
 
 
+exports.registerEmployee = asyncHandler(async (req, res) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(400).json({ message: err.message || "Unable to upload image" });
+        }
+
+        // Check if a file was uploaded
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+
+        // Extract data from the request body
+        const { name, email, password, mobile, team } = req.body;
+
+        // Validate required fields
+        const { isError, error } = checkEmpty({ name, email, password, mobile, team });
+        if (isError) {
+            return res.status(400).json({ message: "All Fields Required", error });
+        }
+
+        // Check for existing email or mobile
+        const existingEmployee = await Employee.findOne({ $or: [{ email }, { mobile }] });
+        if (existingEmployee) {
+            return res.status(400).json({ message: "Email or mobile already exists" });
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        try {
+            // Upload the image to Cloudinary
+            const { secure_url } = await cloudinary.uploader.upload(req.file.path);
+
+            // Create a new employee
+            await Employee.create({
+                name,
+                email,
+                password: hashedPassword,
+                mobile,
+                team,
+                avatar: secure_url
+            });
+
+            res.json({ message: "Employee registered successfully" });
+        } catch (uploadError) {
+            console.error(uploadError);
+            res.status(500).json({ message: "Error uploading image to Cloudinary" });
+        }
+    });
+});
+
+
+
+
+
+
 exports.activateEmployee = asyncHandler(async (req, res) => {
     const { id } = req.params
     await Employee.findByIdAndUpdate(id, { isActive: true })
