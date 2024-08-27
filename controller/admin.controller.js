@@ -65,9 +65,14 @@ exports.registerEmployee = asyncHandler(async (req, res) => {
         if (err) {
             console.log(err);
 
-            return res.status(400).json({ messsage: "Multr Error" + err.message })
+            return res.status(400).json({ message: err.message || "Unable to upload image" })
 
         }
+        console.log(req.file)
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+
         const { name, email, password, mobile, team } = req.body
         const { isError, error } = checkEmpty({ name, email, password, mobile, team })
         if (isError) {
@@ -89,7 +94,7 @@ exports.registerEmployee = asyncHandler(async (req, res) => {
             res.json({ messsage: "egister file Success" })
         } else {
 
-            await Employee.create({ name, email, password: hash, mobile, team })
+            await Employee.create({ name, email, password: hash, mobile, team, ...req.body, avatar: req.file.filename })
             res.json({ messsage: "egister Employee Success" })
         }
 
