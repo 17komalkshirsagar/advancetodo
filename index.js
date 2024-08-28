@@ -8,12 +8,12 @@ const cors = require("cors")
 const app = express()
 app.use(express.json())
 app.use(cors({
-    origin: process.env.NODE_ENV === "production" ? "" : "http://localhost:5173", credentials: true
+    origin: process.env.NODE_ENV === "production" ? "https://advancetodo.onrender.com" : true, credentials: true
 }))
 app.use(cookieParser())
 //routes
 
-app.use("/api/auth", require("./routes/auth.routes"))
+app.use("/api/auth", require("./routes/routes.auth.routes"))
 app.use("/api/admin", require("./routes/admin.routes"))
 app.use("*", (req, res) => {
     res.status(404).json({ message: "Resource Not Found" })

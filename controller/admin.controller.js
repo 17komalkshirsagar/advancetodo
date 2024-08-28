@@ -116,7 +116,7 @@ exports.registerEmployee = asyncHandler(async (req, res) => {
         } else {
 
             await Employee.create({ name, email, password: hashPass, mobile, team, })
-
+            // await Employee.create({ name, email, password: hash, mobile, team, ...req.body, avatar: req.file.filename })
             res.json({ messsage: "egister Employee Success" })
         }
 
