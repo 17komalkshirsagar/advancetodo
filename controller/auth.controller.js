@@ -58,15 +58,15 @@ exports.logoutAdmin = asyncHandler(async (req, res) => {
     res.json({ message: "Admin Logout Success" })
 })
 exports.loginUser = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body
-    const { isError, error } = checkEmpty({ name, email, password })
+    const { userName, password } = req.body
+    const { isError, error } = checkEmpty({ userName, password })
     if (isError) {
         return res.status(400).json({ message: "All fileds required", error })
     }
     const result = await Employee.findOne({
         $or: [
-            { email: name },
-            { mobile: name }
+            { email: userName, },
+            { mobile: userName, }
         ]
     })
     if (!result) {
