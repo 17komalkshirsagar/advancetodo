@@ -13,7 +13,9 @@ app.use(cors({
 app.use(cookieParser())
 //routes
 
+
 app.use("/api/auth", require("./routes/routes.auth.routes"))
+app.use("/api/employee", require("./routes/employeePersonaId.routes"))
 app.use("/api/admin", require("./routes/admin.routes"))
 app.use("*", (req, res) => {
     res.status(404).json({ message: "Resource Not Found" })

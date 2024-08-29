@@ -135,7 +135,16 @@ exports.deactivateEmployee = asyncHandler(async (req, res) => {
     await Employee.findByIdAndUpdate(id, { isActive: true })
     res.json({ message: "Employee De active Success" })
 })
+5
 
+//get all id employee todo
+
+exports.getEmployeePersonalTodo = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const result = await Todo.find({ employee: id }).populate("employee")
+    return res.json({ messsage: "employee Todo Success", result })
+
+})
 //Todo
 
 exports.createTodo = asyncHandler(async (req, res) => {

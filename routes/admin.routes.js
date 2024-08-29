@@ -18,7 +18,7 @@ router
 
     .put("/activate-employee/:id", adminController.activateEmployee)
     .put("/deactivate-employee/:id", adminController.deactivateEmployee)
-
+    .get("/fetch-employee-details/:id", adminController.getEmployeePersonalTodo)
 
 
     //Todo
